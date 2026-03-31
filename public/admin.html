@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BUTCHER SHOP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-panel { max-width: 1100px; margin: 3rem auto; }
+        .admin-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+        .admin-actions button { border: none; padding: 0.8rem 1.2rem; border-radius: 0.75rem; cursor: pointer; background: var(--btn-primary); color: white; font-weight: 600; }
+        .admin-section { background: var(--card-bg); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .admin-section h2 { margin-bottom: 1rem; }
+        .admin-list { list-style: none; padding: 0; margin: 0; }
+        .btn-danger { background: #ef4444; color: white; border: none; border-radius: 0.75rem; padding: 0.65rem 1rem; cursor: pointer; }
+        .btn-secondary { background: #4b5563; color: white; border: none; border-radius: 0.75rem; padding: 0.65rem 1rem; cursor: pointer; }
+        .admin-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .admin-modal.show {
+            display: flex;
+        }
+        .admin-modal-card {
+            width: min(760px, 95%);
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            padding: 1.5rem;
+        }
+        .admin-modal-card h2 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        .admin-modal-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .admin-modal-grid .form-group { display: flex; flex-direction: column; }
+        .admin-modal-grid label { margin-bottom: 0.4rem; font-weight: 600; }
+        .admin-modal-grid input,
+        .admin-modal-grid textarea {
+            width: 100%;
+            padding: 0.75rem 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        .admin-modal-actions {
+            margin-top: 1.2rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .admin-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.25rem;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        @media (max-width: 640px) {
+            .admin-modal-grid { grid-template-columns: 1fr; }
+        }
+        .admin-list li { border-bottom: 1px solid var(--border-color); padding: 1rem 0; }
+        .admin-list li:last-child { border-bottom: none; }
+        .admin-list .item-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.5rem; color: var(--text-secondary); }
+        .admin-list strong { display: block; margin-bottom: 0.35rem; }
+        @media (max-width: 768px) { .admin-actions { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container admin-panel">
+            <h1 class="section-title" data-i18n="admin_title">Admin Dashboard</h1>
+            <div class="admin-actions">
+                <button id="show-orders-btn" data-i18n="admin_tab_orders">Orders</button>
+                <button id="show-messages-btn" data-i18n="admin_tab_messages">Messages</button>
+                <button id="show-products-btn" data-i18n="admin_tab_products">Products</button>
+                <button id="add-product-btn" data-i18n="admin_add_product">Add Product</button>
+            </div>
+            <div id="admin-content" class="admin-section"></div>
+            <div id="product-modal" class="admin-modal" aria-hidden="true">
+                <div class="admin-modal-card">
+                    <button class="admin-modal-close" id="close-product-modal">×</button>
+                    <h2 id="product-modal-title">Add Product</h2>
+                    <form id="product-form">
+                        <div class="admin-modal-grid">
+                            <div class="form-group">
+                                <label for="product-name-en">Name (English)</label>
+                                <input id="product-name-en" name="name_en" type="text" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-name-ar">Name (Arabic)</label>
+                                <input id="product-name-ar" name="name_ar" type="text" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-type">Type</label>
+                                <input id="product-type" name="type" type="text" required placeholder="meat">
+                            </div>
+                            <div class="form-group">
+                                <label for="product-price">Price</label>
+                                <input id="product-price" name="price" type="number" step="0.01" required placeholder="0">
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label for="product-description-en">Description (English)</label>
+                                <textarea id="product-description-en" name="description_en" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label for="product-description-ar">Description (Arabic)</label>
+                                <textarea id="product-description-ar" name="description_ar" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label for="product-image">Image URL</label>
+                                <input id="product-image" name="image" type="text" required placeholder="images/meet.jpg">
+                            </div>
+                        </div>
+                        <div class="admin-modal-actions">
+                            <button type="button" class="btn-secondary" id="cancel-product-btn">Cancel</button>
+                            <button type="submit" class="btn-primary" id="save-product-btn">Save Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container"><span>© 2025 BUTCHER SHOP. All rights reserved.</span></div>
+    </footer>
+
+    <script src="js/translations.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function saveOrders(orders) {
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        function saveMessages(messages) {
+            localStorage.setItem('localContacts', JSON.stringify(messages));
+        }
+
+        function getSavedProducts() {
+            return JSON.parse(localStorage.getItem('customProducts') || '[]');
+        }
+
+        function saveProducts(products) {
+            localStorage.setItem('customProducts', JSON.stringify(products));
+        }
+
+        async function fetchProductsFromFile() {
+            try {
+                const response = await fetch('data/products.json');
+                if (!response.ok) throw new Error('Unable to load products data');
+                const productsFromFile = await response.json();
+                return productsFromFile.map(product => ({
+                    ...product,
+                    custom: false
+                }));
+            } catch (error) {
+                console.error(error);
+                return [];
+            }
+        }
+
+        async function getAllProducts() {
+            const savedProducts = getSavedProducts();
+            const savedMap = new Map(savedProducts.map(product => [product.id, product]));
+            const fileProducts = await fetchProductsFromFile();
+            const products = [];
+
+            fileProducts.forEach(product => {
+                const saved = savedMap.get(product.id);
+                if (saved?.deleted) return;
+                products.push(saved ? { ...product, ...saved, custom: true } : product);
+                if (saved) savedMap.delete(product.id);
+            });
+
+            savedProducts.forEach(product => {
+                if (!product.deleted && !fileProducts.some(fp => fp.id === product.id)) {
+                    products.push({ ...product, custom: true });
+                }
+            });
+
+            return products;
+        }
+
+        async function renderProducts() {
+            const products = await getAllProducts();
+            const content = document.getElementById('admin-content');
+            if (!products.length) {
+                content.innerHTML = `<p>${t('admin_no_products')}</p>`;
+                return;
+            }
+            content.innerHTML = `<div>
+                <h2>${t('admin_tab_products')} (${products.length})</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">${t('admin_all_products_visible')}</p>
+                <ul class="admin-list">${products.map((product, idx) => {
+                    const name = product.name_en || product.name;
+                    const description = product.description_en || product.description;
+                    const actions = `
+                        <div style="margin-top:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <button class="btn-secondary admin-action" data-action="edit-product" data-product-id="${product.id}">${t('edit_product')}</button>
+                            <button class="btn-danger admin-action" data-action="delete-product" data-product-id="${product.id}">${t('delete_product')}</button>
+                        </div>
+                    `;
+                    return `
+                        <li>
+                            <strong>${name}</strong> • ${product.type || '-'} • $${product.price.toFixed(2)}
+                            <div class="item-meta">
+                                <div><strong>${t('product_description')}:</strong> ${description}</div>
+                            </div>
+                            ${actions}
+                        </li>
+                    `;
+                }).join('')}</ul>
+            </div>`;
+        }
+
+        let currentProductId = null;
+
+        function openProductModal(mode, product = null, productId = null) {
+            const modal = document.getElementById('product-modal');
+            const title = document.getElementById('product-modal-title');
+            const form = document.getElementById('product-form');
+            currentProductId = productId;
+            title.textContent = mode === 'edit' ? t('admin_edit_product') : t('admin_add_product');
+            form.dataset.mode = mode;
+            if (product) {
+                form.name_en.value = product.name_en || product.name || '';
+                form.name_ar.value = product.name_ar || '';
+                form.description_en.value = product.description_en || product.description || '';
+                form.description_ar.value = product.description_ar || '';
+                form.type.value = product.type || '';
+                form.price.value = product.price || 0;
+                form.image.value = product.image || 'images/meet.jpg';
+            } else {
+                form.reset();
+                form.type.value = 'meat';
+                form.image.value = 'images/meet.jpg';
+            }
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            currentProductId = null;
+        }
+
+        function addProduct() {
+            openProductModal('add');
+        }
+
+        async function editProduct(productId) {
+            const allProducts = await getAllProducts();
+            const product = allProducts.find(p => p.id === Number(productId));
+            if (!product) return;
+            openProductModal('edit', product, productId);
+        }
+
+        function deleteProduct(productId) {
+            const products = getSavedProducts();
+            const index = products.findIndex(p => p.id === Number(productId));
+            const deletedEntry = { id: Number(productId), deleted: true };
+            if (index !== -1) {
+                products[index] = deletedEntry;
+            } else {
+                products.push(deletedEntry);
+            }
+            saveProducts(products);
+            renderProducts();
+            alert(t('admin_product_deleted'));
+        }
+
+        function saveProductForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            const mode = form.dataset.mode;
+            const products = getSavedProducts();
+            const productId = currentProductId !== null ? Number(currentProductId) : Date.now();
+            const newProduct = {
+                id: productId,
+                custom: true,
+                deleted: false,
+                name_en: form.name_en.value.trim(),
+                name_ar: form.name_ar.value.trim(),
+                name: form.name_en.value.trim(),
+                description_en: form.description_en.value.trim(),
+                description_ar: form.description_ar.value.trim(),
+                description: form.description_en.value.trim(),
+                type: form.type.value.trim(),
+                price: parseFloat(form.price.value) || 0,
+                image: form.image.value.trim() || 'images/meet.jpg'
+            };
+            const existingIndex = products.findIndex(p => p.id === productId);
+            if (mode === 'edit' && existingIndex !== -1) {
+                products[existingIndex] = newProduct;
+                alert(t('admin_product_edited'));
+            } else if (mode === 'edit') {
+                products.push(newProduct);
+                alert(t('admin_product_edited'));
+            } else {
+                products.push(newProduct);
+                alert(t('admin_product_added'));
+            }
+            saveProducts(products);
+            closeProductModal();
+            renderProducts();
+        }
+
+        function renderOrders() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const content = document.getElementById('admin-content');
+            if (!orders.length) {
+                content.innerHTML = `<p>${t('admin_no_orders')}</p>`;
+                return;
+            }
+            content.innerHTML = `<div><h2>${t('admin_tab_orders')}</h2><ul class="admin-list">${orders.map((order, idx) => `
+                <li>
+                    <strong>${t('order_customer')}:</strong> ${order.customer.name} (${order.customer.email})
+                    <div class="item-meta">
+                        <div><strong>${t('order_items')}:</strong> ${order.items.map(item => `${item.name} × ${item.quantity}`).join(', ')}</div>
+                        <div><strong>${t('order_total')}:</strong> $${order.total.toFixed(2)}</div>
+                    </div>
+                    <div style="margin-top:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <button class="btn-secondary admin-action" data-action="edit-order" data-index="${idx}">${t('edit_order')}</button>
+                        <button class="btn-danger admin-action" data-action="delete-order" data-index="${idx}">${t('delete_order')}</button>
+                    </div>
+                </li>
+            `).join('')}</ul></div>`;
+        }
+
+        function renderMessages() {
+            const messages = JSON.parse(localStorage.getItem('localContacts') || '[]');
+            const content = document.getElementById('admin-content');
+            if (!messages.length) {
+                content.innerHTML = `<p>${t('admin_no_messages')}</p>`;
+                return;
+            }
+            content.innerHTML = `<div><h2>${t('admin_tab_messages')}</h2><ul class="admin-list">${messages.map((message, idx) => `
+                <li>
+                    <strong>${message.name}</strong> • ${message.email}
+                    <p style="margin:0.5rem 0;">${message.message}</p>
+                    <div style="margin-top:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <button class="btn-secondary admin-action" data-action="edit-message" data-index="${idx}">${t('edit_message')}</button>
+                        <button class="btn-danger admin-action" data-action="delete-message" data-index="${idx}">${t('delete_message')}</button>
+                    </div>
+                </li>
+            `).join('')}</ul></div>`;
+        }
+
+        function editOrder(index) {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const order = orders[index];
+            if (!order) return;
+            const name = prompt(t('prompt_order_customer_name'), order.customer.name);
+            const email = prompt(t('prompt_order_customer_email'), order.customer.email);
+            const total = parseFloat(prompt(t('prompt_order_total'), order.total)) || order.total;
+            if (name && email) {
+                order.customer.name = name;
+                order.customer.email = email;
+                order.total = total;
+                saveOrders(orders);
+                renderOrders();
+                alert(t('admin_order_edited'));
+            }
+        }
+
+        function deleteOrder(index) {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.splice(index, 1);
+            saveOrders(orders);
+            renderOrders();
+            alert(t('admin_order_deleted'));
+        }
+
+        function editMessage(index) {
+            const messages = JSON.parse(localStorage.getItem('localContacts') || '[]');
+            const message = messages[index];
+            if (!message) return;
+            const name = prompt(t('prompt_message_name'), message.name);
+            const email = prompt(t('prompt_message_email'), message.email);
+            const text = prompt(t('prompt_message_text'), message.message);
+            if (name && email && text) {
+                message.name = name;
+                message.email = email;
+                message.message = text;
+                saveMessages(messages);
+                renderMessages();
+                alert(t('admin_message_edited'));
+            }
+        }
+
+        function deleteMessage(index) {
+            const messages = JSON.parse(localStorage.getItem('localContacts') || '[]');
+            messages.splice(index, 1);
+            saveMessages(messages);
+            renderMessages();
+            alert(t('admin_message_deleted'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getCurrentUser();
+            if (!user || !isAdminEmail(user.email)) {
+                window.location.href = 'login.html';
+                return;
+            }
+            updateCartCount();
+            renderProducts();
+            document.getElementById('show-orders-btn').addEventListener('click', renderOrders);
+            document.getElementById('show-messages-btn').addEventListener('click', renderMessages);
+            document.getElementById('show-products-btn').addEventListener('click', renderProducts);
+            document.getElementById('add-product-btn').addEventListener('click', addProduct);
+            document.getElementById('close-product-modal').addEventListener('click', closeProductModal);
+            document.getElementById('cancel-product-btn').addEventListener('click', closeProductModal);
+            document.getElementById('product-form').addEventListener('submit', saveProductForm);
+            document.getElementById('admin-content').addEventListener('click', (event) => {
+                const button = event.target.closest('.admin-action');
+                if (!button) return;
+                const action = button.dataset.action;
+                const index = Number(button.dataset.index);
+                const productId = Number(button.dataset.productId);
+                if (action === 'delete-order') deleteOrder(index);
+                if (action === 'edit-order') editOrder(index);
+                if (action === 'delete-message') deleteMessage(index);
+                if (action === 'edit-message') editMessage(index);
+                if (action === 'delete-product') deleteProduct(productId);
+                if (action === 'edit-product') editProduct(productId);
+            });
+        });
+    </script>
+</body>
+</html>

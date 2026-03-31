@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "لحم بقري طازج",
+    "type": "meat",
+    "price": 250.00,
+    "image": "images/meet.jpg",
+    "description": "لحم بقري طازج مبرد، مناسب للشواء والطبخات المختلفة."
+  },
+  {
+    "id": 2,
+    "name": "صدور دجاج مجمدة",
+    "type": "frozen",
+    "price": 120.00,
+    "image": "images/checken.jpg",
+    "description": "صدور دجاج خالية من الدهون، مجمدة طازجة."
+  },
+  {
+    "id": 3,
+    "name": "جبنة شيدر مبشورة",
+    "type": "dairy",
+    "price": 45.00,
+    "image": "images/cheese.jpg",
+    "description": "جبنة شيدر مبشورة، 200 جرام."
+  },
+  {
+    "id": 4,
+    "name": "خضروات مشكلة مجمدة",
+    "type": "frozen",
+    "price": 35.00,
+    "image": "images/veg.jpg",
+    "description": "خليط خضروات مشكلة (جزر، بازلاء، ذرة)."
+  },
+  {
+    "id": 5,
+    "name": "زبدة طبيعية",
+    "type": "dairy",
+    "price": 60.00,
+    "image": "images/zebda.jpg",
+    "description": "زبدة طبيعية غير مملحة، 250 جرام."
+  }
+]

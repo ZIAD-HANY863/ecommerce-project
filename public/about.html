@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - BUTCHER SHOP</title>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        
+        .story-section {
+            display: block;
+            margin: 3rem 0;
+        }
+        .story-text {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .value-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .value-card:hover {
+            transform: translateY(-5px);
+        }
+        .value-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .timeline {
+            position: relative;
+            padding: 1rem 0;
+            margin: 2rem 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: var(--btn-primary);
+        }
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+        .timeline-date {
+            width: 45%;
+            text-align: right;
+            font-weight: bold;
+            color: var(--btn-primary);
+        }
+        .timeline-content {
+            width: 45%;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        @media (max-width: 768px) {
+            .story-section {
+                grid-template-columns: 1fr;
+            }
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item,
+            .timeline-item:nth-child(odd) {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 1rem;
+            }
+            .timeline-date {
+                width: auto;
+                text-align: left;
+            }
+            .timeline-content {
+                width: auto;
+                flex: 1;
+            }
+        }
+        .hero {
+            background: linear-gradient(135deg, #C47A2E, #8B5A2B) !important;
+        }
+        .btn-primary {
+            background: #C47A2E !important;
+        }
+        .btn-primary:hover {
+            background: #A05E1F !important;
+        }
+        .timeline-date {
+            color: #C47A2E;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="hero" style="background: linear-gradient(135deg, #C47A2E, #8B5A2B); padding: 3rem 2rem; border-radius: 1rem; margin-bottom: 3rem;" data-aos="fade-up">
+                <h1 style="color: white;">BUTCHER SHOP</h1>
+                    <p style="color: rgba(255,255,255,0.9); max-width: 600px; margin: 1rem auto 0;" data-i18n="about_hero_text">Premium fresh meats, natural dairy, and high-quality frozen goods. Discover easy delicious meals with our curated ingredients.</p>
+            </div>
+            <div class="story-section" data-aos="fade-right">
+                <div class="story-text">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 1rem;" data-i18n="about_story_title">Our Story</h2>
+                    <p style="margin-bottom: 1rem;" data-i18n="about_story_p1">We started in 2022 with one goal: deliver fresh, safe food to our customers while inspiring them with easy, delicious recipes using our products. We select the best farms and suppliers to ensure unmatched quality.</p>
+                    <p style="margin-bottom: 1rem;" data-i18n="about_story_p2">We believe great food starts with great ingredients. That's why our products are free from hormones and harmful additives, and we work with chefs and nutrition experts to develop recipes for every taste.</p>
+                    <p data-i18n="about_story_p3">Today, our store is a destination for families seeking quality and authentic flavor, and we are proud to help you cook memorable meals at home.</p>
+                </div>
+            </div>
+
+            
+            <h2 class="section-title" data-aos="fade-up" data-i18n="about_values_title">Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="value-icon">🥩</div>
+                    <h3 data-i18n="value_creativity">Unmatched Freshness</h3>
+                    <p style="color: var(--text-secondary);" data-i18n="value_creativity_desc">We deliver meat and dairy fresh from the source to your door.</p>
+                </div>
+                <div class="value-card" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="value-icon">🍽️</div>
+                    <h3 data-i18n="value_quality">Creative Recipes</h3>
+                    <p style="color: var(--text-secondary);" data-i18n="value_quality_desc">We offer easy, quick recipes using our products to save time and effort.</p>
+                </div>
+                <div class="value-card" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="value-icon">🤝</div>
+                    <h3 data-i18n="value_trust">Trust and Transparency</h3>
+                    <p style="color: var(--text-secondary);" data-i18n="value_trust_desc">We provide labels that show product origin, production date, and expiry.</p>
+                </div>
+                <div class="value-card" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="value-icon">🌱</div>
+                    <h3 data-i18n="value_sustainability">Sustainability</h3>
+                    <p style="color: var(--text-secondary);" data-i18n="value_sustainability_desc">We use eco-friendly packaging and support local farms.</p>
+                </div>
+            </div>
+
+            
+            <h2 class="section-title" data-aos="fade-up" data-i18n="about_timeline_title">Our Journey</h2>
+            <div class="timeline" data-aos="fade-up">
+                <div class="timeline-item">
+                    <div class="timeline-date">2022</div>
+                    <div class="timeline-content">
+                        <h3 data-i18n="timeline_2023_title">Launch</h3>
+                        <p data-i18n="timeline_2023_desc">We opened the online store with four departments: meats, dairy, frozen foods, and recipes.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2023</div>
+                    <div class="timeline-content">
+                        <h3 data-i18n="timeline_2024_title">Growth</h3>
+                        <p data-i18n="timeline_2024_desc">Added 20 new products and expanded into new cities.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-content">
+                        <h3 data-i18n="timeline_2025_title">Partnerships</h3>
+                        <p data-i18n="timeline_2025_desc">Partnered with professional chefs to develop exclusive recipes for our customers.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Future</div>
+                    <div class="timeline-content">
+                        <h3 data-i18n="timeline_future_title">Vision 2026</h3>
+                        <p data-i18n="timeline_future_desc">Reach one million customers, launch a mobile app, and expand delivery coverage.</p>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div style="text-align: center; margin: 4rem 0 2rem;" data-aos="fade-up">
+                <p style="font-size: 1.2rem; margin-bottom: 1rem;" data-i18n="about_contact_cta">Have a question or suggestion? We’d love to hear from you!</p>
+                <a href="contact.html" class="btn-primary" style="display: inline-block; padding: 0.8rem 2rem; text-decoration: none;" data-i18n="about_contact_btn">Contact Us</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <span data-i18n="footer_copyright">© 2025 BUTCHER SHOP. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 100 });
+    </script>
+</body>
+</html>

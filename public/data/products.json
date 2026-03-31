@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name_en": "Fresh Beef",
+    "name_ar": "لحم بقر طازج",
+    "name": "Fresh Beef",
+    "type": "meat",
+    "price": 250.00,
+    "image": "images/meet.jpg",
+    "description_en": "Premium chilled beef, perfect for grilling and cooking.",
+    "description_ar": "لحم بقر مبرد ممتاز، مثالي للشواء والطهي.",
+    "description": "Premium chilled beef, perfect for grilling and cooking."
+  },
+  {
+    "id": 2,
+    "name_en": "Frozen Chicken Breast",
+    "name_ar": "صدر دجاج مجمد",
+    "name": "Frozen Chicken Breast",
+    "type": "frozen",
+    "price": 120.00,
+    "image": "images/checken.jpg",
+    "description_en": "Skinless chicken breast, frozen fresh.",
+    "description_ar": "صدر دجاج بدون جلد، مجمد طازج.",
+    "description": "Skinless chicken breast, frozen fresh."
+  },
+  {
+    "id": 3,
+    "name_en": "Shredded Cheddar Cheese",
+    "name_ar": "جبنة شيدر مبشورة",
+    "name": "Shredded Cheddar Cheese",
+    "type": "dairy",
+    "price": 45.00,
+    "image": "images/cheese.jpg",
+    "description_en": "200g shredded cheddar cheese.",
+    "description_ar": "200 جرام من جبنة الشيدر المبشورة.",
+    "description": "200g shredded cheddar cheese."
+  },
+  {
+    "id": 4,
+    "name_en": "Mixed Frozen Vegetables",
+    "name_ar": "خضار مجمدة مشكلة",
+    "name": "Mixed Frozen Vegetables",
+    "type": "frozen",
+    "price": 35.00,
+    "image": "images/veg.jpg",
+    "description_en": "Blend of mixed vegetables (carrots, peas, corn).",
+    "description_ar": "مزيج من الخضروات المجمدة (جزر، بازيلاء، ذرة).",
+    "description": "Blend of mixed vegetables (carrots, peas, corn)."
+  },
+  {
+    "id": 5,
+    "name_en": "Natural Butter",
+    "name_ar": "زبدة طبيعية",
+    "name": "Natural Butter",
+    "type": "dairy",
+    "price": 60.00,
+    "image": "images/zebda.jpg",
+    "description_en": "Unsalted natural butter, 250g.",
+    "description_ar": "زبدة طبيعية غير مملحة، 250 جرام.",
+    "description": "Unsalted natural butter, 250g."
+  }
+]

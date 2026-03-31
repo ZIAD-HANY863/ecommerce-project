@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - BUTCHER SHOP</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .cart-item { display: flex; gap: 1rem; background: var(--card-bg); padding: 1rem; border-radius: 1rem; margin-bottom: 1rem; align-items: center; flex-wrap: wrap; }
+        .cart-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem; }
+        .cart-item-details { flex: 1; }
+        .cart-item-title { font-weight: 600; margin-bottom: 0.5rem; }
+        .cart-item-price { color: var(--text-secondary); }
+        .cart-item-quantity { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
+        .cart-item-quantity label { font-size: 0.95rem; min-width: 48px; color: var(--text-secondary); font-weight: 700; }
+        .cart-item-quantity input { width: 60px; min-width: 60px; padding: 0.4rem; text-align: center; border: 1px solid var(--border-color); border-radius: 0.5rem; background: var(--bg-primary); color: var(--text-primary); }
+        .qty-btn { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); border-radius: 0.5rem; cursor: pointer; }
+        .cart-item { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+        .cart-item-details { flex: 1 1 240px; min-width: 240px; }
+        .cart-item-price { color: var(--text-secondary); margin-bottom: 0.5rem; }
+        .cart-item-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+        .cart-item-quantity input::-webkit-inner-spin-button,
+        .cart-item-quantity input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .btn-danger { background: #ef4444; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; }
+        .btn-danger:hover { background: #dc2626; }
+        .cart-total { text-align: right; font-size: 1.5rem; margin-top: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 1rem; }
+        .checkout-btn { display: inline-block; margin-top: 1rem; background: var(--btn-primary); color: white; text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; }
+        .empty-cart { text-align: center; padding: 2rem; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <h1 class="section-title" data-aos="fade-up" data-i18n="cart_title">Shopping Cart</h1>
+            <div id="cart-items-container"></div>
+            <div id="cart-total" class="cart-total"></div>
+            <div class="cart-actions" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0.75rem; margin-top:1rem;">
+                <button id="remove-all-btn" class="btn-danger" data-i18n="remove_all">Remove All</button>
+                <a href="checkout.html" class="checkout-btn" data-i18n="checkout_btn">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container"><span>© 2025 BUTCHER SHOP. All rights reserved.</span></div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 100 });
+
+        let productCatalog = null;
+
+        function getSavedProducts() {
+            return JSON.parse(localStorage.getItem('customProducts') || '[]');
+        }
+
+        async function loadProductCatalog() {
+            if (productCatalog) return productCatalog;
+            try {
+                const response = await fetch('data/products.json');
+                const fileProducts = await response.json();
+                const savedProducts = getSavedProducts();
+                const savedMap = new Map(savedProducts.map(product => [product.id, product]));
+                productCatalog = fileProducts
+                    .map(product => {
+                        const saved = savedMap.get(product.id);
+                        if (saved?.deleted) return null;
+                        return saved ? { ...product, ...saved } : product;
+                    })
+                    .filter(Boolean);
+                savedProducts.forEach(product => {
+                    if (!product.deleted && !productCatalog.some(item => item.id === product.id)) {
+                        productCatalog.push(product);
+                    }
+                });
+            } catch {
+                productCatalog = getSavedProducts();
+            }
+            return productCatalog;
+        }
+
+        function getCartItemProductId(item) {
+            return item.productId || item.id;
+        }
+
+        function getCartItemName(item, lang, products = []) {
+            const productId = getCartItemProductId(item);
+            const product = products.find(p => p.id === Number(productId));
+            if (product) {
+                return lang === 'ar' ? product.name_ar : product.name_en;
+            }
+            if (lang === 'ar') return item.name_ar || item.name || item.name_en || 'Product';
+            return item.name_en || item.name || item.name_ar || 'Product';
+        }
+
+        function getCartItemDescription(item, lang, products = []) {
+            const productId = getCartItemProductId(item);
+            const product = products.find(p => p.id === Number(productId));
+            if (product) {
+                return lang === 'ar' ? product.description_ar : product.description_en;
+            }
+            if (lang === 'ar') return item.description_ar || item.description || item.description_en || '';
+            return item.description_en || item.description || item.description_ar || '';
+        }
+
+        function normalizeCartItems(cart) {
+            let changed = false;
+            cart.forEach(item => {
+                if (!item.productId && item.id) {
+                    item.productId = item.id;
+                    changed = true;
+                }
+            });
+            if (changed) saveCart(cart);
+            return cart;
+        }
+
+        async function renderCart() {
+    const cart = normalizeCartItems(getCart());
+    const container = document.getElementById('cart-items-container');
+    const totalSpan = document.getElementById('cart-total');
+    const lang = window.currentLang || localStorage.getItem('lang') || 'ar';
+    const products = await loadProductCatalog();
+    if (cart.length === 0) {
+        container.innerHTML = `<div class="empty-cart">${t('cart_empty')}</div>`;
+        totalSpan.innerHTML = '';
+        return;
+    }
+    let total = 0;
+    container.innerHTML = cart.map((item, idx) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        const name = getCartItemName(item, lang, products);
+        const description = getCartItemDescription(item, lang, products);
+        const isCustom = item.type === 'custom-3d';
+        const editButton = isCustom ? `<button class="btn-edit" data-index="${idx}" aria-label="Edit">✏️</button>` : '';
+        return `
+            <div class="cart-item" data-index="${idx}">
+                <img src="${item.image}" alt="${name}">
+                <div class="cart-item-details">
+                    <div class="cart-item-title">${name}</div>
+                    <div class="cart-item-price">$${item.price}</div>
+                    ${description ? `<div class="cart-item-description">${description}</div>` : ''}
+                </div>
+                <div class="cart-item-actions">
+                    <div class="cart-item-quantity">
+                        <label>${t('quantity_label')}</label>
+                        <button class="qty-btn" data-index="${idx}" data-action="decrease">-</button>
+                        <input type="number" data-index="${idx}" value="${item.quantity}" min="1">
+                        <button class="qty-btn" data-index="${idx}" data-action="increase">+</button>
+                    </div>
+                    <button class="btn-danger" data-index="${idx}" aria-label="${t('remove_item')}">🗑️</button>
+                    ${editButton}
+                </div>
+                <div><strong>$${itemTotal.toFixed(2)}</strong></div>
+            </div>
+        `;
+    }).join('');
+    totalSpan.innerHTML = `<strong>${t('cart_total')}: $${total.toFixed(2)}</strong>`;
+
+    
+    document.querySelectorAll('.cart-item-quantity input').forEach(inp => {
+        inp.addEventListener('change', (e) => {
+            const idx = parseInt(inp.dataset.index);
+            let qty = parseInt(inp.value);
+            if (isNaN(qty) || qty < 1) qty = 1;
+            updateQuantity(idx, qty);
+            renderCart();
+        });
+    });
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.dataset.index);
+            const action = btn.dataset.action;
+            const cart = getCart();
+            if (!cart[idx]) return;
+            let qty = parseInt(cart[idx].quantity) || 1;
+            qty = action === 'increase' ? qty + 1 : Math.max(1, qty - 1);
+            updateQuantity(idx, qty);
+            renderCart();
+        });
+    });
+    document.querySelectorAll('.cart-item .btn-danger[data-index]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.dataset.index);
+            removeItem(idx);
+            renderCart();
+        });
+    });
+    
+}
+
+
+document.getElementById('remove-all-btn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to remove all items from your cart?')) {
+        localStorage.removeItem('cart');
+        renderCart();
+        updateCartCount();
+    }
+});
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+            updateCartCount(); 
+            window.onLanguageChanged = renderCart;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUTCHER SHOP | Home</title>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        
+        :root {
+            --btn-primary: #C47A2E;
+            --btn-primary-hover: #A05E1F;
+            --accent: #8B5A2B;
+        }
+        .hero {
+            background: linear-gradient(135deg, #C47A2E, #8B5A2B) !important;
+        }
+        .hero .btn {
+            background: white;
+            color: #C47A2E;
+        }
+        .hero .btn:hover {
+            background: #f0f0f0;
+        }
+        .section-title {
+            color: var(--text-primary);
+            border-right: 4px solid #C47A2E;
+            padding-right: 1rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class="main-content">
+        
+        <div class="hero" data-aos="fade-up" data-aos-duration="1000">
+            <div class="container">
+                <h1 data-aos="zoom-in" data-aos-delay="200" data-i18n="hero_title">Best Fresh Meat, Dairy, and Frozen Products</h1>
+                <p data-aos="fade-up" data-aos-delay="400" style="font-size: 1.2rem;" data-i18n="hero_desc">Explore our fresh products and discover tasty meals for every taste.</p>
+                <a href="products.html" class="btn" data-aos="flip-up" data-aos-delay="600" data-i18n="hero_btn">Shop Now</a>
+            </div>
+        </div>
+
+        <div class="container">
+            
+            <h2 class="section-title" data-aos="fade-right" data-i18n="section_featured">Featured Products</h2>
+            <div class="products-grid" id="featured-products"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <span data-i18n="footer_copyright">© 2025 BUTCHER SHOP. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 100 });
+
+        
+        async function loadFeaturedProducts() {
+            const API_URL = 'data/products.json';
+            try {
+                const response = await fetch(API_URL);
+                const products = await response.json();
+                const lang = window.currentLang || localStorage.getItem('lang') || 'ar';
+                const featured = products.slice(0, 3);
+                const container = document.getElementById('featured-products');
+                container.innerHTML = featured.map((p, idx) => {
+                    const name = lang === 'ar' ? p.name_ar : p.name_en;
+                    const description = lang === 'ar' ? p.description_ar : p.description_en;
+                    return `
+                    <div class="product-card" data-aos="fade-up" data-aos-delay="${idx * 100}">
+                        <img src="${p.image}" alt="${name}">
+                        <div class="product-card-body">
+                            <h3 class="product-title">${name}</h3>
+                            <p class="product-description">${description}</p>
+                            <p class="product-price">$${p.price}</p>
+                            <button class="btn-primary add-to-cart" 
+                                data-id="${p.id}" 
+                                data-name-en="${p.name_en}" 
+                                data-name-ar="${p.name_ar}" 
+                                data-price="${p.price}" 
+                                data-image="${p.image}">
+                                ${t('add_to_cart_btn')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                }).join('');
+                AOS.refresh();
+                document.querySelectorAll('.add-to-cart').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        addToCart({
+                            id: parseInt(btn.dataset.id),
+                            productId: parseInt(btn.dataset.id),
+                            name_en: btn.dataset.nameEn,
+                            name_ar: btn.dataset.nameAr,
+                            price: parseFloat(btn.dataset.price),
+                            image: btn.dataset.image,
+                            type: 'standard',
+                            quantity: 1
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('featured-products').innerHTML = '<p style="text-align:center; color: var(--text-secondary);">An error occurred while loading products.</p>';
+            }
+        }
+
+        function getSavedProducts() {
+            return JSON.parse(localStorage.getItem('customProducts') || '[]');
+        }
+
+        async function loadFeaturedProducts() {
+            const API_URL = 'data/products.json';
+            try {
+                const response = await fetch(API_URL);
+                const productsFromFile = await response.json();
+                const savedProducts = getSavedProducts();
+                const savedMap = new Map(savedProducts.map(product => [product.id, product]));
+                const products = productsFromFile
+                    .map(product => {
+                        const saved = savedMap.get(product.id);
+                        if (saved?.deleted) return null;
+                        return saved ? { ...product, ...saved } : product;
+                    })
+                    .filter(Boolean);
+                savedProducts.forEach(product => {
+                    if (!product.deleted && !products.some(item => item.id === product.id)) {
+                        products.push(product);
+                    }
+                });
+                const lang = window.currentLang || localStorage.getItem('lang') || 'ar';
+                const featured = products.slice(0, 3);
+                const container = document.getElementById('featured-products');
+                container.innerHTML = featured.map((p, idx) => {
+                    const name = lang === 'ar' ? p.name_ar : p.name_en;
+                    const description = lang === 'ar' ? p.description_ar : p.description_en;
+                    return `
+                    <div class="product-card" data-aos="fade-up" data-aos-delay="${idx * 100}">
+                        <img src="${p.image}" alt="${name}">
+                        <div class="product-card-body">
+                            <h3 class="product-title">${name}</h3>
+                            <p class="product-description">${description}</p>
+                            <p class="product-price">$${p.price}</p>
+                            <button class="btn-primary add-to-cart" 
+                                data-id="${p.id}" 
+                                data-name-en="${p.name_en}" 
+                                data-name-ar="${p.name_ar}" 
+                                data-price="${p.price}" 
+                                data-image="${p.image}">
+                                ${t('add_to_cart_btn')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                }).join('');
+                AOS.refresh();
+                document.querySelectorAll('.add-to-cart').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        addToCart({
+                            id: parseInt(btn.dataset.id),
+                            productId: parseInt(btn.dataset.id),
+                            name_en: btn.dataset.nameEn,
+                            name_ar: btn.dataset.nameAr,
+                            price: parseFloat(btn.dataset.price),
+                            image: btn.dataset.image,
+                            type: 'standard',
+                            quantity: 1
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('featured-products').innerHTML = '<p style="text-align:center; color: var(--text-secondary);">An error occurred while loading products.</p>';
+            }
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                loadFeaturedProducts();
+                window.onLanguageChanged = loadFeaturedProducts;
+            }, 100);
+        });
+    </script>
+</body>
+</html>

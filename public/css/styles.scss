@@ -1,0 +1,66 @@
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --border-color: #e5e7eb;
+  --card-bg: #ffffff;
+  --footer-bg: #f3f4f6;
+  --btn-primary: #3b82f6;
+  --btn-primary-hover: #2563eb;
+  --btn-secondary: #6b7280;
+  --accent: #8b5cf6;
+}
+
+html.dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --border-color: #374151;
+  --card-bg: #1f2937;
+  --footer-bg: #111827;
+  --btn-primary: #3b82f6;
+  --btn-primary-hover: #60a5fa;
+  --btn-secondary: #4b5563;
+  --accent: #a78bfa;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.bg-primary-custom {
+  background-color: var(--bg-primary);
+}
+.text-primary-custom {
+  color: var(--text-primary);
+}
+.bg-card {
+  background-color: var(--card-bg);
+}
+.border-custom {
+  border-color: var(--border-color);
+}
+
+.btn-primary {
+  background-color: var(--btn-primary);
+  color: white;
+  transition: background-color 0.2s;
+}
+.btn-primary:hover {
+  background-color: var(--btn-primary-hover);
+}
+.btn-secondary {
+  background-color: var(--btn-secondary);
+  color: white;
+}
+
+.footer {
+  background-color: var(--footer-bg);
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+}

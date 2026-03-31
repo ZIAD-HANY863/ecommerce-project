@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - BUTCHER SHOP</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .form-card, .summary-card { background: var(--card-bg); padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        input, textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background: var(--bg-primary); color: var(--text-primary); }
+        @media (max-width: 768px) { .checkout-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <h1 class="section-title" data-aos="fade-up" data-i18n="checkout_title">Checkout</h1>
+            <div class="checkout-grid">
+                <div class="form-card" data-aos="fade-right">
+                    <form id="checkout-form">
+                        <div class="form-group">
+                            <label data-i18n="full_name">Full Name</label>
+                            <input type="text" id="name" required data-i18n="full_name" placeholder="Full Name">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="email">Email</label>
+                            <input type="email" id="email" required data-i18n="email" placeholder="Email">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="address">Address</label>
+                            <textarea id="address" rows="3" required data-i18n="address" placeholder="Address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="phone">Phone Number</label>
+                            <input type="tel" id="phone" required data-i18n="phone" placeholder="Phone Number">
+                        </div>
+                        <button type="submit" class="btn-primary" style="width:100%;" data-i18n="submit_order">Place Order</button>
+                    </form>
+                </div>
+                <div class="summary-card" data-aos="fade-left">
+                    <h3 data-i18n="order_summary">Order Summary</h3>
+                    <div id="order-summary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container"><span>© 2025 BUTCHER SHOP. All rights reserved.</span></div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 100 });
+
+        async function getCartItemDisplayName(item) {
+            const lang = window.currentLang || localStorage.getItem('lang') || 'ar';
+            try {
+                const response = await fetch('data/products.json');
+                const products = await response.json();
+                const product = products.find(p => p.id === item.productId);
+                if (product) {
+                    return lang === 'ar' ? product.name_ar : product.name_en;
+                }
+            } catch {
+                
+            }
+            return lang === 'ar' ? item.name_ar || item.name || item.name_en || 'Product' : item.name_en || item.name || item.name_ar || 'Product';
+        }
+
+        async function renderOrderSummary() {
+            const cart = getCart();
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const summaryDiv = document.getElementById('order-summary');
+            if (cart.length === 0) {
+                summaryDiv.innerHTML = `<p>${t('cart_empty')}</p>`;
+                return;
+            }
+            const itemsHtml = await Promise.all(cart.map(async item => {
+                const displayName = await getCartItemDisplayName(item);
+                return `<li>${displayName} × ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</li>`;
+            }));
+            summaryDiv.innerHTML = `
+                <ul style="list-style: none; padding:0;">
+                    ${itemsHtml.join('')}
+                </ul>
+                <hr style="margin: 1rem 0;">
+                <strong>Total: $${total.toFixed(2)}</strong>
+            `;
+        }
+
+        document.getElementById('checkout-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cart = getCart();
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
+            const total = cart.reduce((s,i) => s + i.price * i.quantity, 0);
+
+            const orderData = {
+                id: Date.now(),
+                customer: { name, email, address, phone },
+                items: cart,
+                total,
+                date: new Date().toISOString()
+            };
+
+            
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(orderData);
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            
+            localStorage.removeItem('cart');
+            updateCartCount();
+
+            alert(t('order_success'));
+            window.location.href = 'index.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOrderSummary();
+            updateCartCount();
+            window.onLanguageChanged = renderOrderSummary;
+        });
+    </script>
+</body>
+</html>

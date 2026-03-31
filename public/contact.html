@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - BUTCHER SHOP</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .contact-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <h1 class="section-title" data-aos="fade-up" data-i18n="contact_title">Contact Us</h1>
+            <div class="contact-card" data-aos="zoom-in">
+                <form id="contact-form">
+                    <div class="form-group">
+                        <label data-i18n="contact_name">Full Name</label>
+                        <input type="text" id="contact-name" required data-i18n="contact_name" placeholder="Full Name">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="contact_email">Email</label>
+                        <input type="email" id="contact-email" required data-i18n="contact_email" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="contact_message">Message</label>
+                        <textarea id="message" rows="5" required data-i18n="contact_message" placeholder="Message"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width:100%;" data-i18n="contact_send">Send Message</button>
+                </form>
+                <div id="contact-feedback" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <span data-i18n="footer_copyright">© 2025 BUTCHER SHOP. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 100 });
+
+        function saveContactLocally(contact) {
+            const contacts = JSON.parse(localStorage.getItem('localContacts') || '[]');
+            contacts.push(contact);
+            localStorage.setItem('localContacts', JSON.stringify(contacts));
+        }
+
+        document.getElementById('contact-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const message = document.getElementById('message').value;
+            const feedback = document.getElementById('contact-feedback');
+
+            const API_URL = 'http://localhost:5000/api/contact';
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, message })
+                });
+                if (response.ok) {
+                    feedback.innerHTML = `<div style="color: green; text-align: center;">${t('contact_success')}</div>`;
+                    document.getElementById('contact-form').reset();
+                } else {
+                    throw new Error('API response not ok');
+                }
+            } catch (err) {
+                saveContactLocally({ name, email, message, createdAt: new Date().toISOString() });
+                feedback.innerHTML = `<div style="color: green; text-align: center;">${t('contact_success')}</div>`;
+                document.getElementById('contact-form').reset();
+            }
+        });
+    </script>
+</body>
+</html>
